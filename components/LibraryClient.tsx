@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import MediaSection from "./MediaSection";
 import BacklogSection from "./BacklogSection";
 import type { Book, Movie, TvShow, Game, BacklogItem } from "@/types";
@@ -79,6 +80,15 @@ export default function LibraryClient({
       </div>
 
       {/* Sections */}
+      <AnimatePresence mode="wait">
+      <motion.div
+        key={activeTab}
+        initial={{ y: 48, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -24, opacity: 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full"
+      >
       {show("books") && (
         <MediaSection
           heading="BOOKS"
@@ -136,6 +146,8 @@ export default function LibraryClient({
       <div className={isFiltered ? "hidden" : "w-full"}>
         <BacklogSection items={backlog} />
       </div>
+      </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
