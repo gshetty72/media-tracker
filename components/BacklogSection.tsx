@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { BacklogItem } from "@/types";
 import BacklogEntry from "./BacklogEntry";
@@ -10,6 +11,9 @@ interface BacklogSectionProps {
 }
 
 export default function BacklogSection({ items }: BacklogSectionProps) {
+  const [sortedItems, setSortedItems] = useState<BacklogItem[]>(
+    [...items].sort((a, b) => b.likes - a.likes)
+  );
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -23,13 +27,20 @@ export default function BacklogSection({ items }: BacklogSectionProps) {
       .eq("voter_id", voterId)
       .in("backlog_id", ids)
       .then(({ data }) => {
-        if (data) {
-          setLikedIds(new Set(data.map((r) => r.backlog_id)));
-        }
+        if (data) setLikedIds(new Set(data.map((r) => r.backlog_id)));
       });
   }, [items]);
 
-  if (items.length === 0) return null;
+  const handleLikeChange = useCallback((id: number, newCount: number) => {
+    setSortedItems((prev) => {
+      const updated = prev.map((item) =>
+        item.id === id ? { ...item, likes: newCount } : item
+      );
+      return [...updated].sort((a, b) => b.likes - a.likes);
+    });
+  }, []);
+
+  if (sortedItems.length === 0) return null;
 
   return (
     <section className="px-20 py-10 w-full">
@@ -50,11 +61,28 @@ export default function BacklogSection({ items }: BacklogSectionProps) {
             </svg>
           </div>
         </div>
-        <div className="flex flex-col items-start w-full">
-          {items.map((item) => (
-            <BacklogEntry key={item.id} item={item} likedIds={likedIds} />
-          ))}
-        </div>
+
+        <motion.div layout className="flex flex-col items-start w-full">
+          <AnimatePresence initial={false}>
+            {sortedItems.map((item) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="w-full"
+              >
+                <BacklogEntry
+                  item={item}
+                  likedIds={likedIds}
+                  onLikeChange={handleLikeChange}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

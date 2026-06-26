@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import LibraryClient from "@/components/LibraryClient";
 import type { Book, Movie, TvShow, Game, BacklogItem } from "@/types";
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 async function fetchAll() {
   const [books, movies, tvShows, games, backlog] = await Promise.all([

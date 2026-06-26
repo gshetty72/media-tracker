@@ -16,7 +16,7 @@ export default function MediaCard({
 }: MediaCardProps) {
   return (
     <div className="flex flex-col gap-4 items-start shrink-0">
-      <div className="relative w-[240px] h-[320px] bg-black">
+      <div className="relative w-[240px] h-[320px] bg-black transition-transform duration-300 ease-out hover:-translate-y-2">
         {imageUrl ? (
           <Image
             src={imageUrl}

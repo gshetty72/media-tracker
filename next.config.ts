@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
         hostname: "**",
       },
     ],
+    minimumCacheTTL: 0,
+    unoptimized: true,
   },
 };
 

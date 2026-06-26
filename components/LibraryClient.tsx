@@ -33,6 +33,7 @@ export default function LibraryClient({
   const [activeTab, setActiveTab] = useState<Tab>("all");
 
   const show = (tab: Tab) => activeTab === "all" || activeTab === tab;
+  const isFiltered = activeTab !== "all";
 
   return (
     <div className="flex flex-col items-start w-full">
@@ -81,6 +82,7 @@ export default function LibraryClient({
       {show("books") && (
         <MediaSection
           heading="BOOKS"
+          isFiltered={isFiltered}
           items={books.map((b) => ({
             id: b.id,
             title: b.title,
@@ -93,6 +95,7 @@ export default function LibraryClient({
       {show("movies") && (
         <MediaSection
           heading="MOVIES"
+          isFiltered={isFiltered}
           items={movies.map((m) => ({
             id: m.id,
             title: m.title,
@@ -105,6 +108,7 @@ export default function LibraryClient({
       {show("tv") && (
         <MediaSection
           heading="TV SHOWS"
+          isFiltered={isFiltered}
           items={tvShows.map((t) => ({
             id: t.id,
             title: t.title,
@@ -117,6 +121,7 @@ export default function LibraryClient({
       {show("games") && (
         <MediaSection
           heading="GAMES"
+          isFiltered={isFiltered}
           items={games.map((g) => ({
             id: g.id,
             title: g.title,
@@ -127,8 +132,10 @@ export default function LibraryClient({
         />
       )}
 
-      {/* Backlog always visible */}
-      <BacklogSection items={backlog} />
+      {/* Always mounted so like state and sort order survive tab switches */}
+      <div className={isFiltered ? "hidden" : "w-full"}>
+        <BacklogSection items={backlog} />
+      </div>
     </div>
   );
 }

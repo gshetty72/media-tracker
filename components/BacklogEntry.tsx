@@ -23,9 +23,14 @@ function getVoterId(): string {
 interface BacklogEntryProps {
   item: BacklogItem;
   likedIds: Set<number>;
+  onLikeChange: (id: number, newCount: number) => void;
 }
 
-export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
+export default function BacklogEntry({
+  item,
+  likedIds,
+  onLikeChange,
+}: BacklogEntryProps) {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(item.likes);
   const [loading, setLoading] = useState(false);
@@ -48,11 +53,14 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
         .eq("voter_id", voterId);
 
       if (!error) {
+        // Compute new count before any state update to avoid stale closure
+        const newCount = Math.max(0, count - 1);
         setLiked(false);
-        setCount((c) => c - 1);
+        setCount(newCount);
+        onLikeChange(item.id, newCount);
         await supabase
           .from("backlog")
-          .update({ likes: count - 1 })
+          .update({ likes: newCount })
           .eq("id", item.id);
       }
     } else {
@@ -61,11 +69,13 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
         .insert({ backlog_id: item.id, voter_id: voterId });
 
       if (!error) {
+        const newCount = count + 1;
         setLiked(true);
-        setCount((c) => c + 1);
+        setCount(newCount);
+        onLikeChange(item.id, newCount);
         await supabase
           .from("backlog")
-          .update({ likes: count + 1 })
+          .update({ likes: newCount })
           .eq("id", item.id);
       }
     }
@@ -74,7 +84,7 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
   }
 
   return (
-    <div className="flex items-center justify-between py-8 w-full border-t border-[#484848] first:border-t-0">
+    <div className="flex items-center justify-between py-8 w-full border-t border-[#1E1E1E] first:border-t-0">
       <div className="flex gap-4 items-start">
         <div className="relative w-[80px] h-[121px] shrink-0 bg-black">
           {item.poster_url ? (
@@ -84,6 +94,7 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
               fill
               className="object-contain"
               sizes="80px"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full bg-black" />
@@ -110,30 +121,16 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
       <button
         onClick={toggleLike}
         disabled={loading}
-        className="flex flex-col items-center w-16 shrink-0 cursor-pointer disabled:opacity-60 transition-opacity"
+        className="group flex flex-col items-center w-16 shrink-0 cursor-pointer disabled:opacity-60 transition-opacity"
         aria-label={liked ? "Unlike" : "Like"}
       >
         {liked ? (
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="#F85410"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 8C27.6 8 24 13.334 24 16C24 13.334 20.4 8 14 8C7.6 8 6 13.334 6 16C6 30 24 40 24 40C24 40 42 30 42 16C42 13.334 40.4 8 34 8Z" fill="#F85410" stroke="#F85410" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         ) : (
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#a8a8a8"
-            strokeWidth="1.5"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="stroke-[#484848] group-hover:stroke-[#F85410] transition-colors duration-150" d="M34 8C27.6 8 24 13.334 24 16C24 13.334 20.4 8 14 8C7.6 8 6 13.334 6 16C6 30 24 40 24 40C24 40 42 30 42 16C42 13.334 40.4 8 34 8Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
         <p className="font-normal text-[#a8a8a8] text-[16px] leading-normal">
