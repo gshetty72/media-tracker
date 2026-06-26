@@ -76,17 +76,17 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
   return (
     <div className="flex items-center justify-between py-8 w-full border-t border-[#484848] first:border-t-0">
       <div className="flex gap-4 items-start">
-        <div className="relative w-[80px] h-[121px] shrink-0 bg-[#1a1a1a]">
+        <div className="relative w-[80px] h-[121px] shrink-0 bg-black">
           {item.poster_url ? (
             <Image
               src={item.poster_url}
               alt={item.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="80px"
             />
           ) : (
-            <div className="w-full h-full bg-[#1a1a1a]" />
+            <div className="w-full h-full bg-black" />
           )}
         </div>
         <div className="flex flex-col gap-2 items-start">
@@ -118,7 +118,7 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
             width="48"
             height="48"
             viewBox="0 0 24 24"
-            fill="#ef4444"
+            fill="#F85410"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -137,7 +137,7 @@ export default function BacklogEntry({ item, likedIds }: BacklogEntryProps) {
           </svg>
         )}
         <p className="font-normal text-[#a8a8a8] text-[16px] leading-normal">
-          {String(count).padStart(2, "0")}
+          {count}
         </p>
       </button>
     </div>

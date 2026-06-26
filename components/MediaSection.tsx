@@ -22,7 +22,7 @@ export default function MediaSection({ heading, items }: MediaSectionProps) {
         <h2 className="font-extrabold text-white text-[72px] leading-none">
           {heading}
         </h2>
-        <div className="border-t border-[#484848] pt-6 flex gap-5 items-start overflow-x-auto w-full">
+        <div className="border-t border-[#484848] pt-6 flex gap-5 items-start overflow-x-auto w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => (
             <MediaCard
               key={item.id}

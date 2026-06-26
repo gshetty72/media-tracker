@@ -16,17 +16,17 @@ export default function MediaCard({
 }: MediaCardProps) {
   return (
     <div className="flex flex-col gap-4 items-start shrink-0">
-      <div className="relative w-[240px] h-[320px] bg-[#1a1a1a]">
+      <div className="relative w-[240px] h-[320px] bg-black">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="240px"
           />
         ) : (
-          <div className="w-full h-full bg-[#1a1a1a]" />
+          <div className="w-full h-full bg-black" />
         )}
       </div>
       <div className="flex flex-col gap-2 items-start">
